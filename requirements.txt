@@ -1,2 +1,4 @@
 # need to be installed in blender's python with blenderproc pip install ...
 imageio
+numpy
+pyyaml
