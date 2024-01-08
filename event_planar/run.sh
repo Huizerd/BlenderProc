@@ -1,10 +1,20 @@
 #!/usr/bin/env bash
 
-blenderproc run main.py aerial_rocks output
-blenderproc run main.py brick output
-blenderproc run main.py carpet output
-blenderproc run main.py fabric output
-blenderproc run main.py grass output
-blenderproc run main.py lava output
-blenderproc run main.py lego output
-blenderproc run main.py water output
+# go over all the materials
+materials=(aerial_rocks brick carpet fabric grass lava lego water)
+# materials=(aerial_rocks brick)
+
+# regular motions
+motion_files=(x-slow x-medium x-fast y-slow y-medium y-fast z-slow z-medium z-fast nx-slow nx-medium nx-fast ny-slow ny-medium ny-fast r-slow r-medium r-fast nr-slow nr-medium nr-fast)
+for material in ${materials[@]}; do
+    for motionf in ${motion_files[@]}; do
+        echo "Processing $material with $motionf"
+        blenderproc run main.py $material output --motion regular --motion_file motions/$motionf.yaml
+    done
+done
+
+# random bezier motion
+for material in ${materials[@]}; do
+    echo "Processing $material with random bezier motion"
+    blenderproc run main.py $material output --motion random_bezier --motion_file motions/random-bezier.yaml
+done

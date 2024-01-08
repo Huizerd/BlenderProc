@@ -1,0 +1,5 @@
+unscaled_speed: [0, 0, -0.08]
+distance_to_ground: 2
+rotational_speed: [0, 0, 0]
+duration: 100
+time_step: 1
