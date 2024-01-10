@@ -196,7 +196,11 @@ if __name__ == "__main__":
     for i, color in enumerate(data["colors"]):
         image_path = os.path.join(f"{output_dir}/images", f"image_{i:03}.png")
         imageio.imwrite(image_path, color)
-    
+
+    # get forward flow for all frames
+    # TODO: looks crappy/full of artifacts, so compute manually
+    # data.update(bproc.renderer.render_optical_flow(get_backward_flow=False, get_forward_flow=True, blender_image_coordinate_style=False))
+
     # write data to hdf5 container and gif animation
     os.makedirs(f"{output_dir}/hdf5", exist_ok=True)
     bproc.writer.write_hdf5(f"{output_dir}/hdf5", data)
