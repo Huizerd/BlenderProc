@@ -2,7 +2,6 @@
 
 # go over all the materials
 materials=(aerial_rocks brick carpet fabric grass lava lego water)
-# materials=(aerial_rocks brick)
 
 # regular motions
 motion_files=(x-slow x-medium x-fast y-slow y-medium y-fast z-slow z-medium z-fast nx-slow nx-medium nx-fast ny-slow ny-medium ny-fast r-slow r-medium r-fast nr-slow nr-medium nr-fast)
