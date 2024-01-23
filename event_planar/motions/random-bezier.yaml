@@ -1,3 +1,4 @@
 num_control_points: 5
-rotational_disturbance: 0.2
-num_points: 100
+rotational_disturbance: 0.0
+duration: 5
+time_step: 0.01

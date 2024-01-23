@@ -6,7 +6,7 @@ build/
 blender
 .idea/
 .vscode/
-output/
+output*/
 debug/
 resources/AMASS
 resources/cctextures*
