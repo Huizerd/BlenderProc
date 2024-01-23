@@ -9,7 +9,7 @@ import numpy as np
 import yaml
 
 
-def add_random_bezier_trajectory(num_control_points, rotational_disturbance, num_points):
+def add_random_bezier_trajectory(num_control_points, rotational_disturbance, duration, time_step):
     """
     From ChatGPT 4.
     """
@@ -23,11 +23,13 @@ def add_random_bezier_trajectory(num_control_points, rotational_disturbance, num
     #     point[:] = np.dot(rotation_matrix, point)
 
     # generate bezier curve points from control points
+    num_points = int(duration / time_step)
     bezier_points = generate_bezier_points(control_points, num_points)
 
     # convert bezier points to transformation matrices
     prev_rotation = np.array([0, 0, 0])
     positions, rotations = [], []
+    time = np.linspace(0, duration, num_points, endpoint=False)
     for point in bezier_points:
         # generate a smooth random rotation
         random_rotation = prev_rotation + np.random.randn(3) * rotational_disturbance  # small random change
@@ -43,7 +45,7 @@ def add_random_bezier_trajectory(num_control_points, rotational_disturbance, num
         positions.append(point.copy())
         rotations.append(np.radians(random_rotation.copy()))
     
-    return positions, rotations
+    return positions, rotations, time
 
 
 def generate_bezier_points(control_points, num_points):
@@ -72,7 +74,8 @@ def add_regular_trajectory(unscaled_speed, distance_to_ground, rotational_speed,
     rotational_speed = np.array(rotational_speed, dtype=np.float64)  # constant rotational speed
 
     positions, rotations = [], []
-    for _ in np.arange(0, duration, time_step):
+    time = np.linspace(0, duration, int(duration / time_step), endpoint=False)
+    for _ in time:
         # compute scaled speed: multiply by distance to ground
         speed = unscaled_speed * (position[2] - 0.1)  # stop 10cm above plane
 
@@ -94,7 +97,7 @@ def add_regular_trajectory(unscaled_speed, distance_to_ground, rotational_speed,
         positions.append(position.copy())
         rotations.append(np.radians(rotation.copy()))
     
-    return positions, rotations
+    return positions, rotations, time
 
 
 def create_rotation_matrix(angles):
@@ -176,7 +179,7 @@ if __name__ == "__main__":
             motion = yaml.load(f, Loader=yaml.SafeLoader)
 
         # generate camera trajectory
-        positions, rotations = add_regular_trajectory(
+        positions, rotations, time = add_regular_trajectory(
             unscaled_speed=motion["unscaled_speed"],
             distance_to_ground=motion["distance_to_ground"],
             rotational_speed=motion["rotational_speed"],
@@ -189,10 +192,11 @@ if __name__ == "__main__":
             motion = yaml.load(f, Loader=yaml.SafeLoader)
 
         # generate camera trajectory
-        positions, rotations = add_random_bezier_trajectory(
+        positions, rotations, time = add_random_bezier_trajectory(
             num_control_points=motion["num_control_points"],
             rotational_disturbance=motion["rotational_disturbance"],
-            num_points=motion["num_points"],
+            duration=motion["duration"],
+            time_step=motion["time_step"],
         )
 
     # render the scene
@@ -212,7 +216,7 @@ if __name__ == "__main__":
         imageio.imwrite(image_path, color)
 
     # add positions, rotations, time
-    data.update({"pos": positions, "euler": rotations, "time": [np.array([i]) for i in range(len(positions))]})
+    data.update({"pos": positions, "euler": rotations, "time": [np.array([t]) for t in time]})
 
     # get forward flow for all frames
     # TODO: looks crappy/full of artifacts, so compute manually
